@@ -7,7 +7,7 @@
 
 使用了口袋48的api来实现，api的接口参考了 [xsaiting/pocket48-grab](https://github.com/xsaiting/pocket48-grab/wiki)
 
-主要是根据api来做简易的封装便于本人搬运视频
+主要是根据api来做简易的封装便于本宅男搬运视频
 
 
 # TODO：
