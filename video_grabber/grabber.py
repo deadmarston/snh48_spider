@@ -15,6 +15,9 @@ params = {
     "limit": 20
 }
 
+def downloadFile(id, path):
+    pass
+
 def main():
     r = requests.post(url=memberUrl, headers="", data=json.dumps(params))
     print(r.text)
