@@ -1,6 +1,9 @@
 import requests
 import json
+import time
+
 from video_grabber import *
+from helper.logger import *
 
 SUCCESS_CODE = 200
 TOKEN = str(0)
@@ -19,10 +22,7 @@ def check_retcode(message, targetCode=SUCCESS_CODE):
 
 def pocket48_post(url, data={}):
     #data is a dict, converts it to json
-    print(json.dumps(data))
-    print(get_headers())
     r = requests.post(url=url, headers=get_headers(), data=json.dumps(data))
-    print (r.text)
     ret = json.loads(r.text)
     if not check_retcode(ret):
         print("http request failed, return message is %s"%ret['message'] if 'message' in ret.keys() else "unknown")
@@ -44,7 +44,7 @@ def pocket48_login(account, psw):
 
 
 
-#everyday punch
+#everyday punch, must call pocket48_login first
 def pocket48_punch():
     r = pocket48_post(URLS.punch)
     if not r:
@@ -56,25 +56,47 @@ def pocket48_punch():
 #groupID could be found above
 #memberID, 0 means all
 #limit, the limit of response
-def pocket48_memberLive(grounpID=0, memberID=0, limit=20):
-    pass
+def pocket48_memberLive(grounpID=0, memberID=0, lastTime=0, limit=10):
+    data = {"lastTime":lastTime, "groupId":grounpID, "type":0, "memberID":memberID, "limit":limit}
+    r = pocket48_post(URLS.memberLive, data)
+    #needs to parse it into a live list
+    return r
 
 #check the live information
 #isReveiw, 0 means live, 1 means review
 #limit, the limit of response
-def pocket48_openLive(isReview=0, groupID=0, limit=20):
-    pass
+def pocket48_openLive(isReview=0, groupID=0, lastTime=0, limit=20):
+    data = {"isReview":isReview, "groupID":groupID, "limit":limit, "lastTime":lastTime}
+    r = pocket48_post(URLS.openLive, data)
+    #needs to parse it into a live list
+    return r
 
 #get the information of the live
-#type, 0 means open live, 1 means member live
+#type, 0 means open live or all, 1 means member live
 #liveid is the id of live, could be gotten from pocket48_memberLive or pocket48_openLive
-def pocket48_getLiveInfo(liveid, type=0):
-    pass
+def pocket48_getLiveInfo(liveId, type=0):
+    data = {"liveId":liveId, "type":type}
+    r = pocket48_post(URLS.getLiveOne, data)
+    return r
 
 #get the overview of system
-#todo
 def pocket48_syncSystemOverview():
-    pass
+    data = {
+        "videoTypeUtime": "2010-03-24 15:59:11",
+        "musicAlbumUtime": "2010-04-18 14:45:37",
+        "functionUtime": "2010-10-17 15:00:00",
+        "groupUtime": "2010-10-17 17:27:00",
+        "memberInfoUtime": "2010-10-20 11:55:09",
+        "talkUtime": "2010-05-05 18:04:52",
+        "videoUtime": "2010-05-17 18:36:32",
+        "musicUtime": "2010-05-05 15:56:11",
+        "urlUtime": "2010-07-19 12:10:59",
+        "teamUtime": "2010-10-20 10:39:00",
+        "memberPropertyUtime": "2010-02-20 18:57:48",
+        "periodUtime": "2010-10-14 14:45:00"
+    }
+    r = pocket48_post(URLS.systemOverview, data)
+    return r
 
 #get the overview of room
 #friends, todo
@@ -99,8 +121,13 @@ def pocket48_userInfo():
 
 #for test
 def main():
-    pocket48_login("", "")
-    pocket48_punch()
+    r = pocket48_getLiveInfo("5be14c810cf27e32089828ac")
+    jsonPrint(r)
+    # pocket48_syncSystemOverview()
+    pass
+    # pocket48_memberLive()
+    # pocket48_openLive(isReview=0)
+    # pocket48_getLiveInfo("5c46ee150cf27e32089829ba")
     # print ("============test api pocket48_login============")
     # print (pocket48_login("",""))
     # print ("============test api pocket48_login pass============")

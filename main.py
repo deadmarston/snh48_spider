@@ -9,8 +9,11 @@
 ### pocket48 grabber
 ### begin on 20190118
 
+import os
+
 from optparse import OptionParser
 from video_grabber import *
+from video_grabber.grabber import *
 
 default_download_path = "./download"
 '''
@@ -31,7 +34,13 @@ def setup_parser():
     parser.add_option("-t","--team",action="store", dest="teamName", help="qurry the information of team")
     parser.add_option("-d", "--download", action="store", dest="idPath", help="download the record or live today according to the member id or team id in the file")
     parser.add_option("-o", "--output", action="store", dest="outputPath", help="cooperate wth -d, download the record or live to the appointed path")
+    parser.add_option("-u", "--update", action="store", dest="needUpdate", help="force to update the group information, otherwise will use the cache in local(which will be updated once a month)")
     return parser
+
+def getAbsolutePath(path):
+    if os.path.isabs(path):
+        return path
+    return os.path.join(os.path.abspath('.'), path)
 
 def main():
     parser = setup_parser()
@@ -41,11 +50,14 @@ def main():
     if option.teamName:
         pass
     if option.idPath:
+        idPath = getAbsolutePath(option.idPath)
+        needUpdate = option.needUpdate if option.needUpdate else False
         #download the record, check the outputpath
         if option.outputPath:
-            pass
+            outputPath = getAbsolutePath(option.outputPath, needUpdate)
         else:
-            pass
+            outputPath = getAbsolutePath(default_download_path, needUpdate)
+        grapvideo(idPath, outputPath)
 
 main()
 

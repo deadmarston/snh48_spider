@@ -3,10 +3,10 @@
 
 class wrapped_dict(dict):
 
-    def __init__(self, dict):
-        if dict:
-            for key in dict.keys():
-                self[key] = dict[key]
+    def __init__(self, _dict):
+        if type(_dict) == dict:
+            for key in _dict.keys():
+                self[key] = _dict[key]# if type(_dict[key]) != dict else wrapped_dict(_dict[key])
         return super(wrapped_dict, self).__init__()
 
     def __key(self, key):
